@@ -14,9 +14,9 @@ graph TD
     
     subgraph Frontends [React / Vite]
         VibeOne[Vibe One Dashboard :5175]
-        Checkmate[Checkmate :5173]
-        Stash[Stash :5174]
-        Assistant[Assistant(ADK) :5176]
+        Checkmate["Checkmate :5173"]
+        Stash["Stash :5174"]
+        Assistant["Assistant (ADK) :5176"]
     end
     
     subgraph Services [FastAPI Backends]

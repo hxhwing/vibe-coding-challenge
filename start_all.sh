@@ -1,5 +1,18 @@
 #!/bin/bash
 
+# Function to kill process on port
+kill_port() {
+    local port=$1
+    if command -v lsof >/dev/null 2>&1; then
+        lsof -ti:"$port" | xargs kill -9 2>/dev/null
+    elif command -v fuser >/dev/null 2>&1; then
+        fuser -k "$port/tcp" >/dev/null 2>&1
+    else
+        echo "Warning: 'lsof' or 'fuser' not found. Could not auto-kill process on port $port."
+        echo "Please ensure port $port is free."
+    fi
+}
+
 # Function to setup backend
 setup_backend() {
     local service_name=$1
@@ -10,10 +23,16 @@ setup_backend() {
     echo "Setting up $service_name ($dir)..."
     cd "$dir" || exit
 
-    # Create venv if not exists
-    if [ ! -d "venv" ]; then
+    # Create venv if not exists or broken
+    if [ ! -f "venv/bin/activate" ]; then
         echo "Creating virtual environment..."
+        rm -rf venv # Clean up potential broken dir
         python3 -m venv venv
+        
+        if [ ! -f "venv/bin/activate" ]; then
+            echo "Error: Failed to create venv. Check if 'python3-venv' is installed."
+            exit 1
+        fi
     fi
 
     # Activate venv
@@ -62,7 +81,7 @@ setup_frontend() {
 # Kill existing processes
 echo "Stopping existing services..."
 for port in 8001 8002 5173 5174 5175 5176; do
-    lsof -ti:"$port" | xargs kill -9 2>/dev/null
+    kill_port "$port"
 done
 
 # Setup Backends
