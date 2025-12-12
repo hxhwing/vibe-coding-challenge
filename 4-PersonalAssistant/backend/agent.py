@@ -52,8 +52,8 @@ def create_task(title: str, due_date: str = None, tags: list = []) -> dict:
             "status": "success", 
             "message": f"Created task: {title}", 
             "task": data,
-            "link": task_link,
-            "instruction": f"Tell the user: Task created! View it here: {task_link}"
+            "view_url": task_link,
+            "instruction": f"Tell the user: Task created! Check it in Checkmate App"
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -84,7 +84,7 @@ def save_link(url: str, summary: str = None, tags: list = []) -> dict:
             "message": f"Saved link: {data.get('title', url)}", 
             "link": data,
             "view_url": stash_link,
-            "instruction": f"Tell the user: Link saved! View it here: {stash_link}"
+            "instruction": f"Tell the user: Link saved! View it in Stash App"
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
