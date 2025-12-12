@@ -1,53 +1,83 @@
 #!/bin/bash
 
-# Kill existing processes on ports 8001, 8002, 5173, 5174, 5175, 5176
+# Function to setup backend
+setup_backend() {
+    local service_name=$1
+    local dir=$2
+    local port=$3
+    
+    echo "--------------------------------------------------"
+    echo "Setting up $service_name ($dir)..."
+    cd "$dir" || exit
+
+    # Create venv if not exists
+    if [ ! -d "venv" ]; then
+        echo "Creating virtual environment..."
+        python3 -m venv venv
+    fi
+
+    # Activate venv
+    source venv/bin/activate
+
+    # Install dependencies
+    if [ -f "requirements.txt" ]; then
+        echo "Installing requirements..."
+        pip install -r requirements.txt > /dev/null 2>&1
+    fi
+
+    # Start service
+    echo "Starting $service_name on port $port..."
+    nohup uvicorn main:app --host 0.0.0.0 --port "$port" > "../../${service_name// /_}.log" 2>&1 &
+    echo "$service_name PID: $!"
+    
+    cd - > /dev/null || exit
+}
+
+# Function to setup frontend
+setup_frontend() {
+    local service_name=$1
+    local dir=$2
+    local port=$3
+    
+    echo "--------------------------------------------------"
+    echo "Setting up $service_name ($dir)..."
+    cd "$dir" || exit
+
+    # Install dependencies if node_modules missing
+    if [ ! -d "node_modules" ]; then
+        echo "Installing npm dependencies..."
+        npm install > /dev/null 2>&1
+    fi
+
+    # Start service
+    echo "Starting $service_name on port $port..."
+    nohup npm run dev -- --host --port "$port" > "../../${service_name// /_}.log" 2>&1 &
+    echo "$service_name PID: $!"
+    
+    cd - > /dev/null || exit
+}
+
+# --- Main Execution ---
+
+# Kill existing processes
 echo "Stopping existing services..."
-lsof -ti:8001 | xargs kill -9 2>/dev/null
-lsof -ti:8002 | xargs kill -9 2>/dev/null
-lsof -ti:5173 | xargs kill -9 2>/dev/null
-lsof -ti:5174 | xargs kill -9 2>/dev/null
-lsof -ti:5175 | xargs kill -9 2>/dev/null
-lsof -ti:5176 | xargs kill -9 2>/dev/null
+for port in 8001 8002 5173 5174 5175 5176; do
+    lsof -ti:"$port" | xargs kill -9 2>/dev/null
+done
 
-echo "Starting Shared Backend (Port 8001)..."
-cd 2-Stash/backend
-source venv/bin/activate
-nohup uvicorn main:app --host 0.0.0.0 --port 8001 > ../../shared_backend.log 2>&1 &
-echo "Shared Backend PID: $!"
-cd ../..
+# Setup Backends
+setup_backend "Shared Backend" "2-Stash/backend" 8001
+setup_backend "Assistant Backend" "4-PersonalAssistant/backend" 8002
 
-echo "Starting Assistant Backend (Port 8002)..."
-cd 4-PersonalAssistant/backend
-source venv/bin/activate
-nohup uvicorn main:app --host 0.0.0.0 --port 8002 > ../../assistant_backend.log 2>&1 &
-echo "Assistant Backend PID: $!"
-cd ../..
+# Setup Frontends
+setup_frontend "Checkmate Frontend" "1-Checkmate" 5173
+setup_frontend "Stash Frontend" "2-Stash" 5174
+setup_frontend "Vibe One SaaS" "3-SaaS" 5175
+setup_frontend "Assistant Frontend" "4-PersonalAssistant" 5176
 
-echo "Starting Checkmate (Standalone - Port 5173)..."
-cd 1-Checkmate
-nohup npm run dev -- --host --port 5173 > ../checkmate_frontend.log 2>&1 &
-echo "Checkmate Frontend PID: $!"
-cd ..
-
-echo "Starting Stash (Standalone - Port 5174)..."
-cd 2-Stash
-nohup npm run dev -- --host --port 5174 > ../stash_frontend.log 2>&1 &
-echo "Stash Frontend PID: $!"
-cd ..
-
-echo "Starting Vibe One SaaS (Port 5175)..."
-cd 3-SaaS
-nohup npm run dev -- --host --port 5175 > ../saas_frontend.log 2>&1 &
-echo "SaaS Frontend PID: $!"
-cd ..
-
-echo "Starting Assistant Frontend (Standalone - Port 5176)..."
-cd 4-PersonalAssistant
-nohup npm run dev -- --host --port 5176 > ../assistant_frontend.log 2>&1 &
-echo "Assistant Frontend PID: $!"
-cd ..
-
-echo "All services started! Access them via http://<YOUR_IP>:<PORT>"
+echo "--------------------------------------------------"
+echo "All services started! Check logs (*.log) for details."
+echo "Access them via http://<YOUR_IP>:<PORT>"
 echo "Checkmate: Port 5173"
 echo "Stash:     Port 5174"
 echo "Vibe One:  Port 5175"
