@@ -76,7 +76,33 @@ setup_frontend() {
     cd - > /dev/null || exit
 }
 
-# --- Main Execution ---
+# --- IP Detection & Configuration ---
+detect_ip() {
+    # Try to get public IP first, then local, then localhost
+    IP=$(curl -s --connect-timeout 2 ifconfig.me)
+    if [ -z "$IP" ]; then
+        IP=$(hostname -I 2>/dev/null | awk '{print $1}')
+    fi
+    if [ -z "$IP" ]; then
+        IP="localhost"
+    fi
+    echo "$IP"
+}
+
+HOST_IP=$(detect_ip)
+echo "--------------------------------------------------"
+echo "Detected Public/Host IP: $HOST_IP"
+echo "Configuring Frontends..."
+
+# Configure SaaS .env
+echo "VITE_API_URL=http://$HOST_IP:8001" > 3-SaaS/.env
+echo "VITE_ASSISTANT_API_URL=http://$HOST_IP:8002" >> 3-SaaS/.env
+
+# Configure Assistant .env
+echo "VITE_API_URL=http://$HOST_IP:8001" > 4-PersonalAssistant/.env
+echo "VITE_ASSISTANT_API_URL=http://$HOST_IP:8002" >> 4-PersonalAssistant/.env
+
+echo "Updated .env (3-SaaS, 4-PersonalAssistant) to point to $HOST_IP"
 
 # Kill existing processes
 echo "Stopping existing services..."

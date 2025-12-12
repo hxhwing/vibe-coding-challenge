@@ -118,7 +118,21 @@ We have provided a robust script to launch all services in the background (`nohu
     *   Go to: `http://localhost:5175` (or your server's IP).
     *   **Login**: Create a new account or use existing credentials.
 
-### 📝 Manual Startup
+### � Debugging & Logs
+Since services run in the background, you can monitor their status using the provided script:
+```bash
+./monitor_logs.sh
+```
+Or manually view specific logs:
+*   `tail -f shared_backend.log` (Auth/Tasks/Links errors)
+*   `tail -f assistant_backend.log` (AI/Agent errors)
+*   `tail -f saas_frontend.log` (Frontend build/runtime errors)
+
+**Common Issues:**
+*   **Authentication Failed**: Check `shared_backend.log`. If the backend failed to start (e.g., missing dependencies), login will fail.
+*   **Port In Use**: The start script tries to kill old processes, but you can manually check with `lsof -i :8001`.
+
+### �📝 Manual Startup
 If you prefer to run services individually (e.g., for debugging):
 
 1.  **Shared Backend**:
@@ -156,14 +170,12 @@ If you prefer to run services individually (e.g., for debugging):
 If you are accessing these apps from a different machine (not one you are SSH'd into), you must:
 
 1.  **Open Firewall Ports**: Allow Inbound TCP on `8001`, `8002`, `5173`, `5174`, `5175`, `5176`.
-2.  **Configure Frontends**: The Frontends need to know where the Backend lives (it defaults to `localhost`).
+2.  **Run Start Script**: The `start_all.sh` script will **automatically detect your Public/Host IP** and configure the Frontends (`.env` files) to point to the Backends.
 
-    Create a `.env` file in `3-SaaS` (and `4-PersonalAssistant` if using standalone):
-    ```env
-    VITE_API_URL=http://<YOUR_SERVER_IP>:8001
-    VITE_ASSISTANT_API_URL=http://<YOUR_SERVER_IP>:8002
+    ```bash
+    ./start_all.sh
     ```
-    *Then restart the `npm run dev` processes.*
+    *It will print the detected IP during startup.*
 
 ---
 
