@@ -94,15 +94,22 @@ echo "--------------------------------------------------"
 echo "Detected Public/Host IP: $HOST_IP"
 echo "Configuring Frontends..."
 
+# Configure Checkmate .env
+echo "VITE_API_URL=http://$HOST_IP:8001" > 1-Checkmate/.env
+
+# Configure Stash .env
+echo "VITE_API_URL=http://$HOST_IP:8001" > 2-Stash/.env
+
 # Configure SaaS .env
 echo "VITE_API_URL=http://$HOST_IP:8001" > 3-SaaS/.env
 echo "VITE_ASSISTANT_API_URL=http://$HOST_IP:8002" >> 3-SaaS/.env
 
 # Configure Assistant .env
+# Assistant uses VITE_API_URL for Auth (Port 8001) and VITE_ASSISTANT_API_URL for Chat (Port 8002)
 echo "VITE_API_URL=http://$HOST_IP:8001" > 4-PersonalAssistant/.env
 echo "VITE_ASSISTANT_API_URL=http://$HOST_IP:8002" >> 4-PersonalAssistant/.env
 
-echo "Updated .env (3-SaaS, 4-PersonalAssistant) to point to $HOST_IP"
+echo "Updated .env for ALL projects to point to $HOST_IP"
 
 # Kill existing processes
 echo "Stopping existing services..."

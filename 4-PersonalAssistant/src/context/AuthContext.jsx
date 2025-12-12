@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Auth is handled by Shared Backend (Port 8001)
-  const API_URL = import.meta.env.VITE_SHARED_API_URL || 'http://localhost:8001';
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
   const login = async (email, password) => {
     try {
