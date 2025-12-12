@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Divider, Alert } from '@mui/material';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -42,9 +42,9 @@ export default function LoginPage() {
       <Paper elevation={0} sx={{ p: 4, width: '100%', maxWidth: 400, borderRadius: 4, bgcolor: 'white', border: '1px solid #dadce0' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
           <Box sx={{ bgcolor: 'primary.main', borderRadius: 1, p: 0.5, mr: 1, display: 'flex' }}>
-            <Bookmark color="white" size={24} />
+            <CheckSquare color="white" size={24} />
           </Box>
-          <Typography variant="h5" fontWeight="500">Stash</Typography>
+          <Typography variant="h5" fontWeight="500">Checkmate</Typography>
         </Box>
 
         <Typography variant="h6" gutterBottom align="center" sx={{ mb: 3 }}>
