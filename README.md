@@ -12,24 +12,40 @@ The system is built as a **Microservice Architecture** with a Shared Backend and
 graph TD
     User[User Browser]
     
-    subgraph Frontend [React / Vite]
+    subgraph Frontends [React / Vite]
         VibeOne[Vibe One Dashboard :5175]
+        Checkmate[Checkmate :5173]
+        Stash[Stash :5174]
+        Assistant[Assistant(ADK) :5176]
     end
     
-    subgraph Backends [FastAPI / Python]
+    subgraph Services [FastAPI Backends]
         SharedAPI[Shared Backend :8001]
         AssistantAPI[Assistant Service :8002]
     end
     
+    subgraph Database [Google Cloud]
+        Firestore[(Firestore DB)]
+    end
+
     subgraph AI [Google Cloud]
         VertexAI[Vertex AI / Gemini]
     end
 
     User --> VibeOne
-    VibeOne -->|Auth, Tasks, Links| SharedAPI
+    User --> Checkmate
+    User --> Stash
+    User --> Assistant
+
+    VibeOne -->|API| SharedAPI
     VibeOne -->|Chat| AssistantAPI
-    AssistantAPI -->|Tools| SharedAPI
-    AssistantAPI -->|GenAI| VertexAI
+    Checkmate -->|Tasks| SharedAPI
+    Stash -->|Links| SharedAPI
+    Assistant -->|Chat| AssistantAPI
+
+    SharedAPI -->|Persist Users/Tasks/Links| Firestore
+    AssistantAPI -->|Tools: create_task, save_link| SharedAPI
+    AssistantAPI -->|Generate Content| VertexAI
 ```
 
 ### Core Services
@@ -39,8 +55,8 @@ graph TD
     *   **Data**: Stores Users, Tasks, and Links.
 
 2.  **Assistant Service (Port 8002)**:
-    *   **Tech**: FastAPI, Google ADK, Vertex AI.
-    *   **Role**: specialized AI Microservice.
+    *   **Tech**: **Google GenAI Agent Development Kit (ADK)**, FastAPI, Vertex AI.
+    *   **Role**: Intelligent Agent built with the **ADK Framework**.
     *   **Features**: Function Calling (`create_task`, `save_link`) using the Shared Backend APIs.
 
 3.  **Vibe One Frontend (Port 5175)**:

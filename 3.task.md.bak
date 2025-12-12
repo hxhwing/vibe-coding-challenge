@@ -1,0 +1,50 @@
+## Vibe Coding #3 (Integrated SaaS: Checkmate & Stash) - 任务列表
+
+### ⚙️ 统一技术栈 (Unified Technology Stack)
+* **前端框架:** React
+* **UI/样式:** Material UI (MUI) - 统一 Google Style
+* **AI 接口:** LLM API (用于 Checkmate 解析 & Stash 摘要/标签)
+* **后端/云平台:** Node.js/Python 后端 + Google Cloud
+* **统一数据库:** **Google Cloud Firestore** (用于存储所有用户数据，但需保证数据结构和隔离性)
+
+---
+
+### 📋 任务分解 (Task Breakdown)
+
+#### 阶段 1: 统一架构、认证与数据层 (Unified Architecture, Auth & Data Layer)
+
+1.  创建 React 项目骨架，配置统一的 SaaS 主题和 MUI。
+2.  设计并实现 SaaS 的 **Landing Page** (主页)。
+3.  实现统一的后端环境并集成 Google Cloud Platform (GCP)。
+4.  配置 **Google Cloud Firestore**，设计三个主要集合 (Collections)：`users`、`checkmate_lists`、`stash_links`。
+5.  实现用户注册/登录/登出功能（或 Google Login），并将认证数据存储在 `users` 集合。
+6.  实现 **强制认证守卫**，确保用户必须登录才能访问任何功能模块。
+
+#### 阶段 2: 整合 UI 与导航 (Integrated UI & Navigation)
+
+7.  设计并实现统一的 **应用外壳 (App Shell)**，包含用于在 **Checkmate 模块** 和 **Stash 模块** 间切换的永久导航（例如：左侧 Sidebar 或顶部 Tabs）。
+8.  配置路由，实现 `/checkmate` 和 `/stash` 两个独立的视图，确保模块间 UI 不互相干扰。
+9.  设计统一的用户个人资料/设置区域。
+
+#### 阶段 3: Checkmate 模块功能实现 (Checkmate Module Integration)
+
+10. 针对 `checkmate_lists` 集合，实现清单数据的 CRUD API，**必须包含用户ID** 以保证数据隔离。
+11. 重新实现 Checkmate 的客户端状态管理和列表显示组件。
+12. 实现 Checkmate 的 **LLM 智能解析功能**：前端提交自然语言，后端调用 AI 解析为结构化任务列表，并支持预览/确认。
+13. 确保 Checkmate 模块能够独立、完整地工作。
+
+#### 阶段 4: Stash 模块功能实现 (Stash Module Integration)
+
+14. 针对 `stash_links` 集合，实现链接数据的 CRUD API，**必须包含用户ID** 以保证数据隔离。
+15. 重新实现 Stash 的 URL 输入和链接列表显示组件。
+16. 实现后端网页内容抓取功能。
+17. 实现 Stash 的 **LLM 智能处理功能**：后端调用 AI 生成文章的 **简洁摘要** 和 **相关标签**。
+18. 实现链接的分类、筛选和标签云功能。
+19. 确保 Stash 模块能够独立、完整地工作。
+
+#### 阶段 5: 优化、安全与部署 (Optimization, Security & Deployment)
+
+20. 编写并测试 **Firestore Security Rules**，严格执行所有数据（`checkmate_lists` 和 `stash_links`）的 **用户级隔离**。
+21. 整合所有前端和后端代码，进行跨模块的兼容性测试。
+22. 确保应用在响应性和性能方面达到 Material Design 标准。
+23. 将前后端应用部署到 Google Cloud Platform (GCP) 上。

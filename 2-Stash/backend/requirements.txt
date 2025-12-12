@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+google-genai
+python-multipart
+google-auth
+google-cloud-firestore
+requests
+beautifulsoup4
+bcrypt
